@@ -2,6 +2,33 @@ import { createNewCard, deleteCardByCardId } from "../model/flashcard.model.js";
 import { createNewSet, findPublicSets, deleteCardFromSet, getSetBySetId, getSetsByUserId, updateSetBySetId } from "../model/flashcardSet.model.js";
 
 
+export async function postNewCard(req, res) {
+    try {
+        const set = req.set;
+
+        const entry = await createNewCard(req.body);
+        set.flashcards = set.flashcards.concat(entry._id);
+        const result = await set.save();
+        res.status(201).send(result);
+
+    } catch (error) {
+        console.error(error);
+        res.status(400).end()
+    };
+};
+
+export async function deleteCard(req, res) {
+    const { cardId } = req.params;
+    try {
+        const set = await deleteCardFromSet(cardId);
+        await deleteCardByCardId(cardId);
+        res.status(200).send(set);
+    } catch (error) {
+        console.error(error);
+        res.status(500).end();
+    };
+};
+
 export async function postNewSet(req, res) {
     try {
         const userId = req.user.id;
@@ -20,38 +47,9 @@ export async function postNewSet(req, res) {
     };
 };
 
-export async function postNewCard(req, res) {
-    try {
-        const { setId } = req.params;
-        const id = req.user.id;
-
-        const set = await getSetBySetId(setId);
-
-        if (id === set.createdBy.toString()) {
-            const entry = await createNewCard(req.body);
-            set.flashcards = set.flashcards.concat(entry._id);
-            const result = await set.save();
-            res.status(201).send(result);
-        } else {
-            throw new Error("Unauthorized")
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(400).end()
-    };
-};
-
-export async function deleteCard(req, res) {
-    const { cardId } = req.params;
-    try {
-        const set = await deleteCardFromSet(cardId);
-        await deleteCardByCardId(cardId);
-        res.status(200).send(set);
-    } catch (error) {
-        console.error(error);
-        res.status(500).end();
-    };
-};
+export async function deleteSetAndCards(req, res) {
+    const { setId } = req.params;
+}
 
 export async function getSetsByUser(req, res) {
     const userId = req.user.id;
