@@ -32,6 +32,11 @@ export async function createNewSet(data) {
     return entry;
 };
 
+export async function deleteSet(setId) {
+    const response = await FlashcardSet.deleteOne({ _id: setId });
+    return response;
+};
+
 export async function getSetsByUserId(userId) {
     const sets = await FlashcardSet.find({ createdBy: userId });
     return sets;
@@ -41,6 +46,12 @@ export async function getSetBySetId(setId) {
     const set = await FlashcardSet.findOne({ _id: setId }).populate("flashcards");
     return set;
 };
+
+export async function getSetByCardId(cardId) {
+    const set = await FlashcardSet.findOne({ flashcards: cardId });
+    return set;
+};
+
 export async function deleteCardFromSet(cardId) {
     const set = await FlashcardSet.findOneAndUpdate({ flashcards: cardId }, { $pull: { flashcards: cardId } }, { new: true });
     return set;
