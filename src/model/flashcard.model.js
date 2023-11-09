@@ -26,11 +26,11 @@ export async function createNewCard(data) {
 };
 
 export async function deleteCardByCardId(cardId) {
-    const response = Flashcard.deleteOne({ _id: cardId });
+    const response = await Flashcard.deleteOne({ _id: cardId });
     return response;
 };
 
 export async function deleteManyCardsById(array) {
-    const response = Flashcard.deleteMany({ _id: { $in: array } });
+    const response = await Flashcard.deleteMany({ _id: { $in: array } });
     return response;
 };

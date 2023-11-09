@@ -1,4 +1,5 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, ObjectId } from "mongoose";
+
 
 const flashcardSetSchema = new Schema({
     title: {
@@ -20,6 +21,10 @@ const flashcardSetSchema = new Schema({
         type: Boolean,
         default: false
     },
+    session: {
+        type: Schema.Types.ObjectId,
+        ref: "Learnsession"
+    }
 });
 
 const FlashcardSet = model("FlashcardSet", flashcardSetSchema);
@@ -49,6 +54,11 @@ export async function getSetBySetId(setId) {
 
 export async function getSetByCardId(cardId) {
     const set = await FlashcardSet.findOne({ flashcards: cardId });
+    return set;
+};
+
+export async function getSetBySessionId(sessionId) {
+    const set = await FlashcardSet.findOne({ session: sessionId });
     return set;
 };
 

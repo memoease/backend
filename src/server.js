@@ -8,6 +8,7 @@ import { connectToDb } from "./service/db.js";
 import userRouter from "./routes/user.routes.js";
 import groupRouter from "./routes/group.routes.js";
 import flashcardSetRouter from "./routes/flashcardSet.routes.js"
+import learnSessionRouter from "./routes/learnsession.routes.js";
 
 const app = express();
 
@@ -26,6 +27,8 @@ await connectToDb();
 app.use("/user", userRouter);
 app.use("/group", groupRouter);
 app.use("/sets", flashcardSetRouter);
+app.use("/session", learnSessionRouter);
+
 
 //404 error handler
 app.all("*", (req, res, next) => {

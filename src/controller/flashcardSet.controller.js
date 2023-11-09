@@ -1,5 +1,6 @@
 import { createNewCard, deleteCardByCardId, deleteManyCardsById } from "../model/flashcard.model.js";
 import { createNewSet, findPublicSets, deleteCardFromSet, getSetBySetId, getSetsByUserId, updateSetBySetId, getSetByCardId, deleteSet } from "../model/flashcardSet.model.js";
+import { getSessionById } from "../model/learnSession.model.js";
 
 
 export async function postNewCard(req, res) {
@@ -9,6 +10,11 @@ export async function postNewCard(req, res) {
         const entry = await createNewCard(req.body);
         set.flashcards = set.flashcards.concat(entry._id);
         const result = await set.save();
+        if (set.session) {
+            const session = await getSessionById(set.session);
+            session.toLearn = session.toLearn.concat(entry._id);
+            await session.save();
+        }
         res.status(201).send(result);
 
     } catch (error) {
