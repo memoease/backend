@@ -15,8 +15,4 @@ router.delete("/:setId", requireAuth, checkUserAccess, FlashcardSetController.de
 router.put("/:setId", requireAuth, checkUserAccess, FlashcardSetController.updateSetInfo);
 router.get("/public/random", FlashcardSetController.getRandomPublicSets);
 
-
-
-
-
 export default router;

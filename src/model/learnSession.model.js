@@ -32,7 +32,10 @@ export async function getSessionById(sessionId) {
 };
 
 export async function moveCardToLearned(cardId) {
-    const session = await LearnSession.findOneAndUpdate({ toLearn: cardId }, { $pull: { toLearn: cardId } }, { new: true });
+    const session = await LearnSession.findOneAndUpdate(
+        { toLearn: cardId },
+        { $pull: { toLearn: cardId } }, { new: true }
+    );
     session.isLearned = session.isLearned.concat(cardId);
     const result = await session.save();
     return result;
