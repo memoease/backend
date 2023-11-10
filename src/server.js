@@ -8,10 +8,11 @@ import { connectToDb } from "./service/db.js";
 import userRouter from "./routes/user.routes.js";
 import groupRouter from "./routes/group.routes.js";
 import flashcardSetRouter from "./routes/flashcardSet.routes.js"
-
+// express 
 const app = express();
-
+//Middelwaers
 app.use(express.json());
+
 app.use(cookieParser());
 const corsOptions = {
   origin: FRONTEND_PORT,
@@ -21,8 +22,10 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 app.use(cors(corsOptions));
+// connect with db
 await connectToDb();
 
+// Monut Routers
 app.use("/user", userRouter);
 app.use("/group", groupRouter);
 app.use("/sets", flashcardSetRouter);
@@ -32,7 +35,6 @@ app.all("*", (req, res, next) => {
   const error = new Error("Not found");
   error.statusCode = 404;
   error.status = "fail";
-
   next(error);
 });
 
@@ -43,7 +45,7 @@ app.use((err, req, res, next) => {
     status: err.status || "error",
   });
 });
-
+// Der Server gestartet wurde und auf Verbindungen auf http://localhost:PORT wartet
 app.listen(process.env.PORT, () => {
   console.log(`😊 Server running on http://localhost:${process.env.PORT}/`);
 });
