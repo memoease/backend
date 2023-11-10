@@ -1,4 +1,5 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, ObjectId } from "mongoose";
+
 
 const flashcardSetSchema = new Schema({
     title: {
@@ -20,6 +21,10 @@ const flashcardSetSchema = new Schema({
         type: Boolean,
         default: false
     },
+    session: {
+        type: Schema.Types.ObjectId,
+        ref: "Learnsession"
+    }
 });
 
 const FlashcardSet = model("FlashcardSet", flashcardSetSchema);
@@ -32,6 +37,11 @@ export async function createNewSet(data) {
     return entry;
 };
 
+export async function deleteSet(setId) {
+    const response = await FlashcardSet.deleteOne({ _id: setId });
+    return response;
+};
+
 export async function getSetsByUserId(userId) {
     const sets = await FlashcardSet.find({ createdBy: userId });
     return sets;
@@ -41,6 +51,17 @@ export async function getSetBySetId(setId) {
     const set = await FlashcardSet.findOne({ _id: setId }).populate("flashcards");
     return set;
 };
+
+export async function getSetByCardId(cardId) {
+    const set = await FlashcardSet.findOne({ flashcards: cardId });
+    return set;
+};
+
+export async function getSetBySessionId(sessionId) {
+    const set = await FlashcardSet.findOne({ session: sessionId });
+    return set;
+};
+
 export async function deleteCardFromSet(cardId) {
     const set = await FlashcardSet.findOneAndUpdate({ flashcards: cardId }, { $pull: { flashcards: cardId } }, { new: true });
     return set;
