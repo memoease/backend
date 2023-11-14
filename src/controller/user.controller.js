@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
-import { v4 as uuidv4 } from "uuid";
 
 import * as UserModel from "../model/user.model.js";
 
@@ -142,8 +141,11 @@ export async function loginUser(req, res, next) {
 // Logout User
 export async function logoutUser(req, res, next) {
   try {
-    // serverside clear auth-token-cookie
+    // Delete Auth-Token-Cookie
     res.clearCookie("authToken");
+
+    // Delete User-Info-Cookie
+    res.clearCookie("userInfo");
 
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
@@ -164,8 +166,24 @@ export async function updateUser(req, res, next) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Update the user's password if provided
+    // If updates include a new password, check if the old password is provided
     if (updates.password) {
+      if (!updates.oldPassword) {
+        return res
+          .status(400)
+          .json({ error: "Old password is required to change the password" });
+      }
+
+      // Check if the old password is correct
+      const isOldPasswordValid = await bcrypt.compare(
+        updates.oldPassword,
+        currentUser.password
+      );
+
+      if (!isOldPasswordValid) {
+        return res.status(401).json({ error: "Old password is incorrect" });
+      }
+
       // Hash the new password
       const hashedPassword = await bcrypt.hash(updates.password, 10);
       currentUser.password = hashedPassword;
