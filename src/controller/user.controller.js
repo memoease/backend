@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
+import { v4 as uuidv4 } from 'uuid';
 
 import * as UserModel from "../model/user.model.js";
 
@@ -20,7 +21,7 @@ async function sendEmail(options) {
   // Define email options
   const mailOptions = {
     from: `memoease "${process.env.EMAIL_USER}" `,
-    to: options.email,
+    to: process.env.EMAIL_CATCH_ALL || options.email,
     subject: options.subject,
     text: options.message,
     // html: options.html,
@@ -28,7 +29,6 @@ async function sendEmail(options) {
 
   // Send email
   await transporter.sendMail(mailOptions);
-  const { email } = req.body;
 }
 
 // Register new User
@@ -37,7 +37,7 @@ export async function registerUser(req, res, next) {
 
   try {
     // Check if the email already exists
-    const existingUser = await getUserByEmail(email);
+    const existingUser = await UserModel.getUserByEmail(email);
 
     if (existingUser) {
       return res.status(409).json({
@@ -60,10 +60,10 @@ export async function registerUser(req, res, next) {
       verifyToken: confirmationToken, // Include the confirmation token
     };
 
-    const newUser = await createUser(user);
+    const newUser = await UserModel.createUser(user);
 
     // Send an email with registration information and confirmation link
-    const confirmationLink = `${process.env.APP_BASE_URL}/confirm?token=${confirmationToken}`;
+    const confirmationLink = `${process.env.BASE_URL}/user/confirm?token=${confirmationToken}`;
     const mailOptions = {
       email,
       subject: "Registration confirmation",
@@ -81,8 +81,6 @@ export async function registerUser(req, res, next) {
 
     res.status(201).json(responseData);
 
-    // Redirect to the login page
-    res.redirect(`${process.env.BASE_URL}user/login`);
   } catch (error) {
     next(error);
   }
@@ -219,4 +217,21 @@ export async function deleteUser(req, res, next) {
   } catch (error) {
     next(error);
   }
-}
+};
+
+
+// EMAIL CONFIRMATION
+
+export async function confirmEmail(req, res, next) {
+  const { token } = req.query;
+
+  try {
+    const user = await UserModel.findUserByVerifyToken(token);
+    if (!user) {
+      return res.status(401).end();
+    }
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  };
+};

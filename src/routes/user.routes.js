@@ -16,6 +16,9 @@ userRouter.get("/logout", requireAuth, UserController.logoutUser);
 userRouter.patch("/:id", validateId, requireAuth, UserController.updateUser);
 userRouter.delete("/:id", validateId, requireAuth, UserController.deleteUser);
 
+
+// EMAIL CONFIRMATION LINK
+userRouter.get("/confirm", UserController.confirmEmail);
 export default userRouter;
 
 

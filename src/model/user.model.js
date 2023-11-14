@@ -56,3 +56,12 @@ export async function updateUserById(userId, newData) {
 export async function deleteUserById(userId) {
   return User.findByIdAndDelete(userId);
 }
+
+export async function findUserByVerifyToken(verifyToken) {
+  const confirmedUser = await User.findOne({ verifyToken });
+  if (confirmedUser) {
+    confirmedUser.verify = true;
+    confirmedUser.save();
+  };
+  return confirmedUser;
+};
