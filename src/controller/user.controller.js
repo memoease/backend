@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 import * as UserModel from "../model/user.model.js";
 
@@ -80,7 +80,6 @@ export async function registerUser(req, res, next) {
     };
 
     res.status(201).json(responseData);
-
   } catch (error) {
     next(error);
   }
@@ -195,7 +194,16 @@ export async function updateUser(req, res, next) {
     // Update user information in the database
     const updatedUser = await UserModel.updateUserById(userId, currentUser);
 
-    res.status(200).json(updatedUser); // Respond with the updated user object
+    // Create a response object with only the desired fields
+    const responseObj = {};
+    if (updates.name) {
+      responseObj.name = updatedUser.name;
+    }
+    if (updates.password) {
+      responseObj.passwordUpdateSuccess = true;
+    }
+
+    res.status(200).json(responseObj); // Respond with the response object
   } catch (error) {
     next(error);
   }
@@ -217,8 +225,7 @@ export async function deleteUser(req, res, next) {
   } catch (error) {
     next(error);
   }
-};
-
+}
 
 // EMAIL CONFIRMATION
 
@@ -233,5 +240,5 @@ export async function confirmEmail(req, res, next) {
     res.status(204).end();
   } catch (error) {
     next(error);
-  };
-};
+  }
+}
