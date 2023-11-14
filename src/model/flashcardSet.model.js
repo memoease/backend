@@ -43,7 +43,7 @@ export async function deleteSet(setId) {
 };
 
 export async function getSetsByUserId(userId) {
-    const sets = await FlashcardSet.find({ createdBy: userId });
+    const sets = await FlashcardSet.find({ createdBy: userId }).populate("flashcards");
     return sets;
 };
 
