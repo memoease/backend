@@ -1,44 +1,89 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
+import { v4 as uuidv4 } from "uuid";
 
 import * as UserModel from "../model/user.model.js";
+
+// Send Email
+async function sendEmail(options) {
+  // Craete a transporter object
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+    // Activate in gmail "less secure app" option
+    // https://myaccount.google.com/lesssecureapps
+  });
+
+  // Define email options
+  const mailOptions = {
+    from: `memoease "${process.env.EMAIL_USER}" `,
+    to: options.email,
+    subject: options.subject,
+    text: options.message,
+    // html: options.html,
+  };
+
+  // Send email
+  await transporter.sendMail(mailOptions);
+  const { email } = req.body;
+}
 
 // Register new User
 export async function registerUser(req, res, next) {
   const { email, password, name } = req.body;
 
   try {
-    const existingUser = await UserModel.getUserByEmail(email);
-    // check email dublicate
+    // Check if the email already exists
+    const existingUser = await getUserByEmail(email);
+
     if (existingUser) {
       return res.status(409).json({
         error: `User with this email "${email}" already exists!`,
       });
     }
 
-    // password encryption
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = { email, password: hashedPassword, name };
-    // create a new user in the database and get the user object with an assigned ID
-    const newUser = await UserModel.createUser(user);
+    // Generate a unique confirmation token with uuid
+    const confirmationToken = uuidv4();
 
-    const tokenPayload = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
+    // Create a user with the confirmation token
+    const user = {
+      email,
+      password: hashedPassword,
+      name,
+      verify: false, // Mark as not verified initially
+      verifyToken: confirmationToken, // Include the confirmation token
     };
-    // create auth token
-    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-      expiresIn: 60 * 60 * 3, // 3 hours
-    });
-    // respond with token in httpOnly-cookie
-    res.cookie("authToken", token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 3, // 3 hours
-    });
-    // respond with newUser Object
-    res.status(201).json(newUser);
+
+    const newUser = await createUser(user);
+
+    // Send an email with registration information and confirmation link
+    const confirmationLink = `${process.env.APP_BASE_URL}/confirm?token=${confirmationToken}`;
+    const mailOptions = {
+      email,
+      subject: "Registration confirmation",
+      message: `Please confirm your email by clicking the following link: ${confirmationLink}`,
+    };
+
+    await sendEmail(mailOptions);
+
+    // Respond with the newly created user's data
+    const responseData = {
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+    };
+
+    res.status(201).json(responseData);
+
+    // Redirect to the login page
+    res.redirect(`${process.env.BASE_URL}user/login`);
   } catch (error) {
     next(error);
   }
@@ -50,6 +95,7 @@ export async function loginUser(req, res, next) {
 
   try {
     const user = await UserModel.getUserByEmail(email);
+
     // User input validation email/password
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Wrong email or password!" });
@@ -60,19 +106,31 @@ export async function loginUser(req, res, next) {
       name: user.name,
       email: user.email,
     };
-    // create auth-token
+
+    // Create auth-token
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
       expiresIn: 60 * 60 * 3, // 3 hours
     });
 
-    // respond with token in httpOnly-cookie
+    // Set HTTP-only cookie with the auth token
     res.cookie("authToken", token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 3, // 3 hours
     });
 
-    // response with Userinformation
+    // Set a second cookie with user information and HTTP-only set to false
+    res.cookie(
+      "userInfo",
+      JSON.stringify({ id: user._id, email: user.email, name: user.name }),
+      {
+        httpOnly: false,
+        maxAge: 1000 * 60 * 60 * 3, // 3 hours
+      }
+    );
+
+    // Respond with user information
     res.status(200).json({
+      id: user._id,
       email: user.email,
       name: user.name,
     });
