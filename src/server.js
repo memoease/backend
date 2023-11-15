@@ -25,7 +25,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 // connect with db
 await connectToDb();
-
+  
 // Monut Routers
 app.use("/user", userRouter);
 app.use("/group", groupRouter);
