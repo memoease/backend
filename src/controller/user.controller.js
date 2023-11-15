@@ -85,6 +85,22 @@ export async function registerUser(req, res, next) {
   }
 }
 
+// EMAIL CONFIRMATION
+
+export async function confirmEmail(req, res, next) {
+  const { token } = req.query;
+
+  try {
+    const user = await UserModel.findUserByVerifyToken(token);
+    if (!user) {
+      return res.status(401).end();
+    }
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+}
+
 // Login User
 export async function loginUser(req, res, next) {
   const { email, password } = req.body;
@@ -130,6 +146,27 @@ export async function loginUser(req, res, next) {
       email: user.email,
       name: user.name,
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Validate Token
+export async function validateToken(req, res, next) {
+  try {
+    // Check if the "authToken" exists in the cookie
+    const authToken = req.cookies.authToken;
+
+    if (!authToken) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Verify and decode the JWT token
+    // The decoded token (decoded) now contains the user data encoded in the payload.
+    jwt.verify(authToken, process.env.JWT_SECRET);
+
+    // Send a confirmation response indicating the user is authorized
+    res.status(200).json({ message: "Authorized" });
   } catch (error) {
     next(error);
   }
@@ -222,22 +259,6 @@ export async function deleteUser(req, res, next) {
     }
 
     res.status(204).send(); // No content, indicating successful deletion
-  } catch (error) {
-    next(error);
-  }
-}
-
-// EMAIL CONFIRMATION
-
-export async function confirmEmail(req, res, next) {
-  const { token } = req.query;
-
-  try {
-    const user = await UserModel.findUserByVerifyToken(token);
-    if (!user) {
-      return res.status(401).end();
-    }
-    res.status(204).end();
   } catch (error) {
     next(error);
   }
