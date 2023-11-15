@@ -148,8 +148,8 @@ export async function loginUser(req, res, next) {
     });
   } catch (error) {
     next(error);
-  }
-}
+  };
+};
 
 // Validate Token
 export async function validateToken(req, res, next) {
@@ -159,7 +159,7 @@ export async function validateToken(req, res, next) {
 
     if (!authToken) {
       return res.status(401).json({ error: "Unauthorized" });
-    }
+    };
 
     // Verify and decode the JWT token
     // The decoded token (decoded) now contains the user data encoded in the payload.
@@ -169,8 +169,8 @@ export async function validateToken(req, res, next) {
     res.status(200).json({ message: "Authorized" });
   } catch (error) {
     next(error);
-  }
-}
+  };
+};
 
 // Logout User
 export async function logoutUser(req, res, next) {
@@ -184,8 +184,8 @@ export async function logoutUser(req, res, next) {
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     next(error);
-  }
-}
+  };
+};
 
 // Update User
 export async function updateUser(req, res, next) {
