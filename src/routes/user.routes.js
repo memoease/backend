@@ -6,8 +6,11 @@ import { validateEmail, validateId } from "../middleware/ajvValidation.js";
 
 const userRouter = Router();
 
-// User Routes
+// User Register
 userRouter.post("/register", validateEmail, UserController.registerUser);
+// Email Confirmation
+userRouter.get("/confirm", UserController.confirmEmail);
+// User Login
 userRouter.post("/login", validateEmail, UserController.loginUser);
 
 // Auth validation
@@ -18,6 +21,4 @@ userRouter.get("/logout", requireAuth, UserController.logoutUser);
 userRouter.patch("/:id", validateId, requireAuth, UserController.updateUser);
 userRouter.delete("/:id", validateId, requireAuth, UserController.deleteUser);
 
-// EMAIL CONFIRMATION LINK
-userRouter.get("/confirm", UserController.confirmEmail);
 export default userRouter;
