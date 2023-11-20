@@ -38,6 +38,11 @@ export async function createUser(userData) {
   return newUser.save();
 }
 
+// Confirm Email
+export async function findUserByVerifyToken(verifyToken) {
+  return User.findOne({ verifyToken });
+}
+
 // Login
 export async function getUserByEmail(email) {
   return User.findOne({ email });
@@ -56,12 +61,3 @@ export async function updateUserById(userId, newData) {
 export async function deleteUserById(userId) {
   return User.findByIdAndDelete(userId);
 }
-
-export async function findUserByVerifyToken(verifyToken) {
-  const confirmedUser = await User.findOne({ verifyToken });
-  if (confirmedUser) {
-    confirmedUser.verify = true;
-    confirmedUser.save();
-  };
-  return confirmedUser;
-};

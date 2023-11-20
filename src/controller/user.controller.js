@@ -77,26 +77,40 @@ export async function registerUser(req, res, next) {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
+      confirmationToken: confirmationToken,
     };
 
     res.status(201).json(responseData);
   } catch (error) {
+    console.error(error);
     next(error);
   }
 }
 
-// EMAIL CONFIRMATION
-
+// Email Confirmation
 export async function confirmEmail(req, res, next) {
-  const { token } = req.query;
-
   try {
+    const { token } = req.query;
+
+    // Find the user by the verification token
     const user = await UserModel.findUserByVerifyToken(token);
+
+    // If the user is not found, return an error message
     if (!user) {
-      return res.status(401).end();
+      return res
+        .status(401)
+        .json({ error: "Invalid token or user not found." });
     }
-    res.status(204).end();
+
+    // If the user is found and successfully verified, update the user
+    user.verify = true;
+
+    await user.save();
+
+    // Return success
+    return res.redirect(`${process.env.FRONTEND_PORT}/login`);
   } catch (error) {
+    console.error(error);
     next(error);
   }
 }
@@ -148,8 +162,8 @@ export async function loginUser(req, res, next) {
     });
   } catch (error) {
     next(error);
-  };
-};
+  }
+}
 
 // Validate Token
 export async function validateToken(req, res, next) {
@@ -159,7 +173,7 @@ export async function validateToken(req, res, next) {
 
     if (!authToken) {
       return res.status(401).json({ error: "Unauthorized" });
-    };
+    }
 
     // Verify and decode the JWT token
     // The decoded token (decoded) now contains the user data encoded in the payload.
@@ -169,8 +183,8 @@ export async function validateToken(req, res, next) {
     res.status(200).json({ message: "Authorized" });
   } catch (error) {
     next(error);
-  };
-};
+  }
+}
 
 // Logout User
 export async function logoutUser(req, res, next) {
@@ -184,8 +198,8 @@ export async function logoutUser(req, res, next) {
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     next(error);
-  };
-};
+  }
+}
 
 // Update User
 export async function updateUser(req, res, next) {
