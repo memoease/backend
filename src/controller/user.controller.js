@@ -77,7 +77,6 @@ export async function registerUser(req, res, next) {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
-      confirmationToken: confirmationToken,
     };
 
     res.status(201).json(responseData);
@@ -107,7 +106,13 @@ export async function confirmEmail(req, res, next) {
 
     await user.save();
 
-    // Return success
+    // Return success with additional information
+    res.status(200).json({
+      message: `Congrats ${user.name}! You are now registered and can continue with the login to start learning.`,
+      status: "success",
+    });
+
+    // Redirect to login page
     return res.redirect(`${process.env.FRONTEND_PORT}/login`);
   } catch (error) {
     console.error(error);
