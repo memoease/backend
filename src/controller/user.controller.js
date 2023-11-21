@@ -106,14 +106,15 @@ export async function confirmEmail(req, res, next) {
 
     await user.save();
 
-    // Return success with additional information
-    res.status(200).json({
-      message: `Congrats ${user.name}! You are now registered and can continue with the login to start learning.`,
-      status: "success",
-    });
+    // Set success message and status in the URL
+    const successMessage = `Congrats ${user.name}! You are now registered and can continue with the login to start learning.`;
+    const status = "success";
+    const redirectUrl = `${
+      process.env.FRONTEND_PORT
+    }/login?status=${status}&message=${encodeURIComponent(successMessage)}`;
 
-    // Redirect to login page
-    return res.redirect(`${process.env.FRONTEND_PORT}/login`);
+    // Redirect to login page with success message and status in the URL
+    return res.redirect(redirectUrl);
   } catch (error) {
     console.error(error);
     next(error);
