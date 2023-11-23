@@ -1,4 +1,4 @@
-import { createNewCard, deleteCardByCardId, deleteManyCardsById } from "../model/flashcard.model.js";
+import { createNewCard, deleteCardByCardId, deleteManyCardsById, updateCardInfo } from "../model/flashcard.model.js";
 import { createNewSet, findPublicSets, deleteCardFromSet, getSetBySetId, getSetsByUserId, updateSetBySetId, getSetByCardId, deleteSet } from "../model/flashcardSet.model.js";
 import { getSessionById } from "../model/learnSession.model.js";
 
@@ -29,6 +29,17 @@ export async function deleteCard(req, res) {
         const set = await deleteCardFromSet(cardId);
         await deleteCardByCardId(cardId);
         res.status(200).send(set);
+    } catch (error) {
+        console.error(error);
+        res.status(500).end();
+    };
+};
+
+export async function updateCard(req, res) {
+    const { cardId } = req.params;
+    try {
+        const newCard = await updateCardInfo(cardId, req.body);
+        res.status(200).send(newCard);
     } catch (error) {
         console.error(error);
         res.status(500).end();
