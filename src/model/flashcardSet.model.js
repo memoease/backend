@@ -43,7 +43,7 @@ export async function deleteSet(setId) {
 };
 
 export async function getSetsByUserId(userId) {
-    const sets = await FlashcardSet.find({ createdBy: userId }).populate("flashcards");
+    const sets = await FlashcardSet.find({ createdBy: userId }).populate("flashcards").populate("createdBy");
     return sets;
 };
 
@@ -82,5 +82,6 @@ export async function findPublicSets() {
         { $match: { isPublic: true } },
         { $sample: { size: 6 } }
     ]);
+    await FlashcardSet.populate(publicSets, { path: "createdBy" });
     return publicSets;
 };
