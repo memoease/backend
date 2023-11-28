@@ -23,11 +23,12 @@ export default LearnSession;
 export async function createSession(data) {
     const newSession = new LearnSession(data);
     const entry = await newSession.save();
+    entry.populate("toLearn");
     return entry;
 }
 
 export async function getSessionById(sessionId) {
-    const session = await LearnSession.findOne({ _id: sessionId });
+    const session = await LearnSession.findOne({ _id: sessionId }).populate("toLearn");
     return session;
 };
 

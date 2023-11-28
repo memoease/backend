@@ -23,8 +23,9 @@ export async function createLearnsession(req, res) {
       };
       const session = await createSession(newSession);
       set.session = session._id;
+      const getSession = await getSessionById(session._id)
       await set.save();
-      res.status(201).send(session);
+      res.status(201).send(getSession);
     }
   } catch (error) {
     console.error(error);
