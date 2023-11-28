@@ -30,45 +30,31 @@ export async function createSession(data) {
 }
 
 export async function getSessionById(sessionId) {
-  const session = await LearnSession.findOne({ _id: sessionId });
+  const session = await LearnSession.findOne({ _id: sessionId }).populate(
+    "toLearn"
+  );
   return session;
 }
-    const session = await LearnSession.findOne({ _id: sessionId }).populate("toLearn");
-    return session;
-};
 
 export async function moveCardToLearned(cardId) {
   const session = await LearnSession.findOneAndUpdate(
     { toLearn: cardId },
     { $pull: { toLearn: cardId } },
-    { new: true }
-  );
+    { new: true, populate: { path: "toLearn" } }
+  ).populate("toLearn");
   session.isLearned = session.isLearned.concat(cardId);
   const result = await session.save();
   return result;
 }
-    const session = await LearnSession.findOneAndUpdate(
-        { toLearn: cardId },
-        { $pull: { toLearn: cardId } }, { new: true, populate: { path: "toLearn" } }
-    ).populate("toLearn");
-    session.isLearned = session.isLearned.concat(cardId);
-    const result = await session.save();
-    return result;
-};
 
 export async function initalizeSessionCards(sessionId, cards) {
   const updatedSession = await LearnSession.findOneAndUpdate(
     { _id: sessionId },
     { $set: { toLearn: cards, isLearned: [] } },
-    { new: true }
+    { new: true, populate: { path: "toLearn" } }
   );
   return updatedSession;
 }
-    const updatedSession = await LearnSession.findOneAndUpdate(
-        { _id: sessionId },
-        { $set: { toLearn: cards, isLearned: [] } }, { new: true, populate: { path: "toLearn" } });
-    return updatedSession;
-};
 
 export async function deleteSessionsByUserId(userId) {
   const response = await LearnSession.deleteMany({ user: userId });
