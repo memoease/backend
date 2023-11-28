@@ -23,7 +23,6 @@ export default LearnSession;
 export async function createSession(data) {
     const newSession = new LearnSession(data);
     const entry = await newSession.save();
-    entry.populate("toLearn");
     return entry;
 }
 
@@ -35,8 +34,8 @@ export async function getSessionById(sessionId) {
 export async function moveCardToLearned(cardId) {
     const session = await LearnSession.findOneAndUpdate(
         { toLearn: cardId },
-        { $pull: { toLearn: cardId } }, { new: true }
-    );
+        { $pull: { toLearn: cardId } }, { new: true, populate: { path: "toLearn" } }
+    ).populate("toLearn");
     session.isLearned = session.isLearned.concat(cardId);
     const result = await session.save();
     return result;
@@ -45,7 +44,7 @@ export async function moveCardToLearned(cardId) {
 export async function initalizeSessionCards(sessionId, cards) {
     const updatedSession = await LearnSession.findOneAndUpdate(
         { _id: sessionId },
-        { $set: { toLearn: cards, isLearned: [] } }, { new: true });
+        { $set: { toLearn: cards, isLearned: [] } }, { new: true, populate: { path: "toLearn" } });
     return updatedSession;
 };
 
