@@ -4,6 +4,9 @@ import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 
 import * as UserModel from "../model/user.model.js";
+import * as FlashcardSetModel from "../model/flashcardSet.model.js";
+import * as FlashcardModel from "../model/flashcard.model.js";
+import * as LearnSessionModel from "../model/learnSession.model.js";
 
 // Send Email
 async function sendEmail(options) {
@@ -131,6 +134,12 @@ export async function loginUser(req, res, next) {
     // User input validation email/password
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Wrong email or password!" });
+    }
+    // email confirmation validation
+    if (!user.verify) {
+      return res.status(401).json({
+        error: `Email not confirmed for ${user.email}. Please confirm your email address.`,
+      });
     }
 
     const tokenPayload = {
@@ -271,15 +280,39 @@ export async function deleteUser(req, res, next) {
   const userId = req.params.id;
 
   try {
-    // Delete user from the database
-    const deletedUser = await UserModel.deleteUserById(userId);
+    // Find all private sets of the user
+    const userSets = await FlashcardSetModel.getSetsByUserId(userId);
+    const privateSets = userSets.filter((set) => !set.isPublic);
 
-    if (!deletedUser) {
-      return res.status(404).json({ error: "User not found" });
+    // Extract the IDs of the flashcards and sets from the private sets
+    const cardIds = [];
+    const setIds = privateSets.map((set) => set._id);
+
+    for (const set of privateSets) {
+      // Extract the IDs of the flashcards from the current set
+      const currentCardIds = set.flashcards.map((card) => card._id);
+
+      // Add the flashcard IDs to the overall cards array
+      cardIds.push(...currentCardIds);
     }
 
-    res.status(204).send(); // No content, indicating successful deletion
+    // Delete the flashcards for all collected card IDs
+    await FlashcardModel.deleteManyCardsById(cardIds);
+
+    // Delete all collected sets with their set IDs
+    for (const setId of setIds) {
+      await FlashcardSetModel.deleteSet(setId);
+    }
+
+    // Delete the learn sessions of the user
+    await LearnSessionModel.deleteSessionsByUserId(userId);
+
+    // Delete the user
+    await UserModel.deleteUserById(userId);
+
+    res.status(204).end(); // No content, indicating successful deletion
   } catch (error) {
+    console.error(error);
     next(error);
   }
 }
