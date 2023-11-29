@@ -51,9 +51,9 @@ export async function initalizeSessionCards(sessionId, cards) {
         { new: true, populate: { path: "toLearn" } }
     );
     return updatedSession;
-}
+};
 
 export async function deleteSessionsByUserId(userId) {
     const response = await LearnSession.deleteMany({ user: userId });
     return response;
-}
+};
