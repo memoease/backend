@@ -31,7 +31,7 @@ export async function createLearnsession(req, res) {
     console.error(error);
     res.status(500).end();
   }
-}
+};
 
 export async function updateSessionCard(req, res) {
   const { cardId } = req.params;
@@ -42,7 +42,7 @@ export async function updateSessionCard(req, res) {
     console.error(error);
     res.status(500).end();
   }
-}
+};
 
 export async function refreshSession(req, res) {
   const { sessionId } = req.params;
@@ -59,4 +59,4 @@ export async function refreshSession(req, res) {
     console.error(error);
     res.status(500).end();
   }
-}
+};
