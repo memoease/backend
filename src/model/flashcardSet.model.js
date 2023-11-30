@@ -56,7 +56,7 @@ export async function getSetsByUserId(userId) {
 }
 
 export async function getSetBySetId(setId) {
-  const set = await FlashcardSet.findOne({ _id: setId }).populate("flashcards");
+  const set = await FlashcardSet.findOne({ _id: setId }).populate("flashcards").populate("session");
   return set;
 }
 
