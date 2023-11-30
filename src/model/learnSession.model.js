@@ -17,7 +17,7 @@ const LearnSessionSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: "Flashcard",
         },
-    ],
+    ]
 });
 
 const LearnSession = model("Learnsession", LearnSessionSchema);
