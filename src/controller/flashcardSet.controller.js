@@ -94,6 +94,7 @@ export async function getOneSetBySetId(req, res) {
 
     try {
         const set = await getSetBySetId(setId);
+        console.log(set);
         res.status(200).send(set);
     } catch (error) {
         console.error(error);

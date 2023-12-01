@@ -7,6 +7,7 @@ export async function checkUserAccess(req, res, next) {
     try {
         const set = await getSetBySetId(setId);
         req.set = set;
+        console.log(set);
         if (id !== set.createdBy.toString()) {
             res.status(403).end();
         };
