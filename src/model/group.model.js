@@ -19,6 +19,11 @@ const groupSchema = new Schema({
       ref: "User",
     },
   ],
+  flashcardSet: {
+    type: Schema.Types.ObjectId,
+    ref: "FlashcardSet",
+    requrired: true,
+  },
 });
 
 const Group = model("Group", groupSchema);

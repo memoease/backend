@@ -1,6 +1,50 @@
-import { createNewCard, deleteCardByCardId } from "../model/flashcard.model.js";
-import { createNewSet, findPublicSets, deleteCardFromSet, getSetBySetId, getSetsByUserId, updateSetBySetId } from "../model/flashcardSet.model.js";
+import { createNewCard, deleteCardByCardId, deleteManyCardsById, updateCardInfo } from "../model/flashcard.model.js";
+import { createNewSet, findPublicSets, deleteCardFromSet, getSetBySetId, getSetsByUserId, updateSetBySetId, getSetByCardId, deleteSet } from "../model/flashcardSet.model.js";
+import { getSessionById } from "../model/learnSession.model.js";
 
+
+export async function postNewCard(req, res) {
+    try {
+        const set = req.set;
+
+        const entry = await createNewCard(req.body);
+        set.flashcards = set.flashcards.concat(entry._id);
+        const result = await set.save();
+        if (set.session) {
+            const session = await getSessionById(set.session);
+            session.toLearn = session.toLearn.concat(entry._id);
+            await session.save();
+        }
+        res.status(201).send(result);
+
+    } catch (error) {
+        console.error(error);
+        res.status(400).end()
+    };
+};
+
+export async function deleteCard(req, res) {
+    const { cardId } = req.params;
+    try {
+        const set = await deleteCardFromSet(cardId);
+        await deleteCardByCardId(cardId);
+        res.status(200).send(set);
+    } catch (error) {
+        console.error(error);
+        res.status(500).end();
+    };
+};
+
+export async function updateCard(req, res) {
+    const { cardId } = req.params;
+    try {
+        const newCard = await updateCardInfo(cardId, req.body);
+        res.status(200).send(newCard);
+    } catch (error) {
+        console.error(error);
+        res.status(500).end();
+    };
+};
 
 export async function postNewSet(req, res) {
     try {
@@ -20,33 +64,13 @@ export async function postNewSet(req, res) {
     };
 };
 
-export async function postNewCard(req, res) {
+export async function deleteSetAndCards(req, res) {
+    const { setId } = req.params;
+    const set = req.set;
     try {
-        const { setId } = req.params;
-        const id = req.user.id;
-
-        const set = await getSetBySetId(setId);
-
-        if (id === set.createdBy.toString()) {
-            const entry = await createNewCard(req.body);
-            set.flashcards = set.flashcards.concat(entry._id);
-            const result = await set.save();
-            res.status(201).send(result);
-        } else {
-            throw new Error("Unauthorized")
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(400).end()
-    };
-};
-
-export async function deleteCard(req, res) {
-    const { cardId } = req.params;
-    try {
-        const set = await deleteCardFromSet(cardId);
-        await deleteCardByCardId(cardId);
-        res.status(200).send(set);
+        await deleteManyCardsById(set.flashcards);
+        const response = await deleteSet(setId);
+        res.status(200).send(response);
     } catch (error) {
         console.error(error);
         res.status(500).end();
@@ -70,6 +94,7 @@ export async function getOneSetBySetId(req, res) {
 
     try {
         const set = await getSetBySetId(setId);
+        console.log(set);
         res.status(200).send(set);
     } catch (error) {
         console.error(error);

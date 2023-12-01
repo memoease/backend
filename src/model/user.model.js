@@ -3,30 +3,27 @@ import { Schema, model } from "mongoose";
 const userSchema = new Schema({
   email: {
     type: String,
-    required: true,
+    required: [true, "Please provide your email"],
     unique: true,
+    lowercase: true,
   },
   password: {
     type: String,
-    required: true,
+    required: [true, "Please provide a password"],
+    minlength: 8,
   },
   name: {
     type: String,
-    required: true,
+    required: [true, "Please tell us your name"],
   },
-  // To the group creation
-  isAdmin: {
+  verify: {
     type: Boolean,
-    default: false, // Default user is not admin
+    default: false,
   },
-  groups: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Group",
-    },
-  ],
+  verifyToken: {
+    type: String,
+  },
 });
-
 const User = model("User", userSchema);
 
 export default User;
@@ -38,6 +35,11 @@ export default User;
 export async function createUser(userData) {
   const newUser = new User(userData);
   return newUser.save();
+}
+
+// Confirm Email
+export async function findUserByVerifyToken(verifyToken) {
+  return User.findOne({ verifyToken });
 }
 
 // Login

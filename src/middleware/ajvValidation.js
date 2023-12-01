@@ -15,6 +15,12 @@ const emailSchema = {
   format: "email",
 };
 
+const passwordSchema = {
+  type: "string",
+  minLength: 8,
+  maxLength: 72,
+};
+
 export function validateId(req, res, next) {
   const isValid = ajv.validate(idSchema, req.params.id);
 
@@ -30,6 +36,18 @@ export function validateEmail(req, res, next) {
 
   if (!isValid) {
     return res.status(400).json({ error: "Invalid email!" });
+  }
+
+  next();
+}
+
+export function validatePassword(req, res, next) {
+  const isValid = ajv.validate(passwordSchema, req.body.password);
+
+  if (!isValid) {
+    return res.status(400).json({
+      error: "Invalid password! Password must be at least 8 characters long.",
+    });
   }
 
   next();
