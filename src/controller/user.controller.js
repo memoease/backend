@@ -157,6 +157,8 @@ export async function loginUser(req, res, next) {
     res.cookie("authToken", token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 3, // 3 hours
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production" ? true : false,
     });
 
     // Set a second cookie with user information and HTTP-only set to false
@@ -166,6 +168,8 @@ export async function loginUser(req, res, next) {
       {
         httpOnly: false,
         maxAge: 1000 * 60 * 60 * 3, // 3 hours
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production" ? true : false,
       }
     );
 
