@@ -1,50 +1,78 @@
 import * as GroupModel from "../model/group.model.js";
-import { getUserById } from "../model/user.model.js";
+import * as UserModel from "../model/user.model.js";
+import nodemailer from "nodemailer";
+
+// Send Email
+export async function sendEmail(options) {
+  // Create a transporter object
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  // Define email options
+  const mailOptions = {
+    from: `"memoease" <${process.env.EMAIL_USER}>`,
+    to: options.email,
+    subject: options.subject,
+    text: options.message,
+  };
+
+  // Send email
+  await transporter.sendMail(mailOptions);
+}
 
 // Create Group (set creator as admin and add members if provided)
 export async function createGroup(req, res, next) {
   const { name, members } = req.body;
   const userId = req.user.id;
+  const flashcardSetId = req.params.flashcardSetId;
 
   try {
-    const currentUser = await getUserById(userId);
+    // Check if the current user exists
+    const currentUser = await UserModel.getUserById(userId);
 
     if (!currentUser) {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Create group information
     const groupData = {
       name,
       admin: userId,
+      flashcardSet: flashcardSetId,
     };
 
-    if (members && Array.isArray(members) && members.length > 0) {
-      // member validation
-      const validMembers = [];
-      for (const memberId of members) {
-        const member = await getUserById(memberId);
-        if (member) {
-          validMembers.push(memberId);
-        }
-      }
-
-      if (validMembers.length !== members.length) {
-        return res
-          .status(400)
-          .json({ error: "One or more members are invalid users." });
-      }
-
-      const memberIds = validMembers.map((memberId) => {
-        return Types.ObjectId(memberId);
-      });
-
-      groupData.members = memberIds;
-    }
-
+    // Create the group in the database
     const newGroup = await GroupModel.createGroup(groupData);
 
-    res.status(201).json(newGroup);
+    // Generate the link
+    const link = `${process.env.HOMEPAGE_URL}/group/${newGroup._id}/set/${flashcardSetId}`;
+
+    // Send emails to members (if provided)
+    if (members && Array.isArray(members) && members.length > 0) {
+      for (const memberEmail of members) {
+        // Email options
+        const mailOptions = {
+          email: memberEmail,
+          subject: `You have been invited to join a Memoease-Group by ${currentUser.email}`,
+          message: `${currentUser.email} would like to share a Memoease-Set with you and has invited you to the Group ${name}. Click on the link: ${link} and register or log in to access the set.`,
+        };
+        // Send the confirmation email to the member
+        await sendEmail(mailOptions);
+      }
+    }
+
+    // Respond with the link
+    res.status(201).json({
+      newGroup,
+      link,
+    });
   } catch (error) {
+    // Pass the error to the next middleware
     next(error);
   }
 }

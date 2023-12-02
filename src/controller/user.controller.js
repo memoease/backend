@@ -17,8 +17,6 @@ async function sendEmail(options) {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
     },
-    // Activate in gmail "less secure app" option
-    // https://myaccount.google.com/lesssecureapps
   });
 
   // Define email options
