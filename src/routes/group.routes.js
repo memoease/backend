@@ -8,6 +8,7 @@ const groupRouter = Router();
 
 // Group Routes
 groupRouter.post("/:id", validateId, requireAuth, GroupController.createGroup);
+groupRouter.put("/member", requireAuth, GroupController.pushUserToGroup);
 groupRouter.get("/user/groups", requireAuth, GroupController.getGroupsByUser);
 groupRouter.patch("/:id", validateId, requireAuth, GroupController.updateGroup); // Requires admin permission
 groupRouter.delete(

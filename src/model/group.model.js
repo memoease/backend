@@ -46,7 +46,7 @@ export async function createGroupWithMemberIds(groupData, memberIds) {
   return newGroup.save();
 }
 
-// Get Groups by Group-OId
+// Get Group by Group-Id
 export async function getGroupById(groupId) {
   return Group.findById(groupId);
 }

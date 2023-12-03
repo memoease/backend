@@ -7,6 +7,7 @@ import * as UserModel from "../model/user.model.js";
 import * as FlashcardSetModel from "../model/flashcardSet.model.js";
 import * as FlashcardModel from "../model/flashcard.model.js";
 import * as LearnSessionModel from "../model/learnSession.model.js";
+import * as GroupModel from "../model/group.model.js";
 
 // Send Email
 async function sendEmail(options) {

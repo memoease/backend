@@ -77,6 +77,49 @@ export async function createGroup(req, res, next) {
   }
 }
 
+// Function to add the user to the group
+export async function pushUserToGroup(req, res, next) {
+  const { groupId } = req.body;
+  const userId = req.user.id; // Assumption: The user is logged in through authentication
+
+  try {
+    // Retrieve group information from the database
+    const currentGroup = await GroupModel.getGroupById(groupId);
+
+    if (!currentGroup) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    // Add the user to the group
+    if (!currentGroup.members.includes(userId)) {
+      currentGroup.members.push(userId);
+    }
+
+    // Save the updated group to the database
+    const updatedGroup = await GroupModel.updateGroupById(
+      groupId,
+      currentGroup
+    );
+
+    // Optional: Send a confirmation email to the user
+    const user = await UserModel.getUserById(userId);
+    if (user) {
+      const mailOptions = {
+        email: user.email,
+        subject: `You have been added to a Memoease-Group`,
+        message: `You have been added to the group ${currentGroup.name}.`,
+      };
+      await sendEmail(mailOptions);
+    }
+
+    // Send a confirmation back
+    res.status(200).json({ message: "User added to the group successfully" });
+  } catch (error) {
+    // Error handling
+    next(error);
+  }
+}
+
 // Get all User Groups
 export async function getGroupsByUser(req, res, next) {
   const userId = req.user.id;
