@@ -66,10 +66,10 @@ export async function postNewSet(req, res, next) {
 
 export async function postNewSetFromPublicSet(req, res, next) {
     try {
-        const setId = req.params;
+        const { setId } = req.params;
         const userId = req.user.id;
 
-        const copySet = await getOneSetBySetId(setId);
+        const copySet = await getSetBySetId(setId);
 
         const newEntry = {
             title: copySet.title,

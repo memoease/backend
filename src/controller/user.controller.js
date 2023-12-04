@@ -111,8 +111,7 @@ export async function confirmEmail(req, res, next) {
     // Set success message and status in the URL
     const successMessage = `Congrats ${user.name}! You are now registered and can continue with the login to start learning.`;
     const status = "success";
-    const redirectUrl = `${process.env.FRONTEND_PORT
-      }/login?status=${status}&message=${encodeURIComponent(successMessage)}`;
+    const redirectUrl = `${process.env.FRONTEND_PORT}/login?status=${status}&message=${encodeURIComponent(successMessage)}`;
 
     // Redirect to login page with success message and status in the URL
     return res.redirect(redirectUrl);
