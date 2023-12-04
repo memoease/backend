@@ -7,6 +7,7 @@ import * as FlashcardSetController from "../controller/flashcardSet.controller.j
 const router = Router();
 
 router.post("/", requireAuth, FlashcardSetController.postNewSet);
+router.post("/:setId", requireAuth, FlashcardSetController.postNewSetFromPublicSet)
 router.post(
   "/card/:setId",
   requireAuth,

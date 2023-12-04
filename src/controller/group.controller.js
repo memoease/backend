@@ -74,27 +74,28 @@ export async function createGroup(req, res, next) {
         newGroup,
         link,
       });
-    } catch (error) {
-      // Pass the error to the next middleware
-      next(error);
     }
+  } catch (error) {
+    // Pass the error to the next middleware
+    next(error);
   }
+}
 
 // Function to add the user to the group
 export async function pushUserToGroup(req, res, next) {
-    const { groupId } = req.body;
-    const userId = req.user.id; // Assumption: The user is logged in through authentication
+  const { groupId } = req.body;
+  const userId = req.user.id; // Assumption: The user is logged in through authentication
 
-    try {
-      // Retrieve group information from the database
-      const currentGroup = await GroupModel.getGroupById(groupId);
+  try {
+    // Retrieve group information from the database
+    const currentGroup = await GroupModel.getGroupById(groupId);
 
-      if (!currentGroup) {
-        return res.status(404).json({ error: "Group not found" });
-      }
+    if (!currentGroup) {
+      return res.status(404).json({ error: "Group not found" });
+    }
 
-      groupData.members = memberIds;
-    };
+    groupData.members = memberIds;
+
 
     // Save the updated group to the database
     const updatedGroup = await GroupModel.updateGroupById(
