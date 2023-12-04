@@ -41,28 +41,28 @@ export default User;
 export async function createUser(userData) {
   const newUser = new User(userData);
   return newUser.save();
-}
+};
 
 // Confirm Email
 export async function findUserByVerifyToken(verifyToken) {
   return User.findOne({ verifyToken });
-}
+};
 
 // Login
 export async function getUserByEmail(email) {
   return User.findOne({ email });
-}
+};
 
 export async function getUserById(userId) {
   return User.findById(userId);
-}
+};
 
 // Update
 export async function updateUserById(userId, newData) {
   return User.findByIdAndUpdate(userId, newData, { new: true });
-}
+};
 
 // Delete User
 export async function deleteUserById(userId) {
   return User.findByIdAndDelete(userId);
-}
+};

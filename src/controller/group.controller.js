@@ -54,46 +54,47 @@ export async function createGroup(req, res, next) {
 
     // Send emails to members (if provided)
     if (members && Array.isArray(members) && members.length > 0) {
-      for (const memberEmail of members) {
-        // Email options
-        const mailOptions = {
-          email: memberEmail,
-          subject: `You have been invited to join a Memoease-Group by ${currentUser.email}`,
-          message: `${currentUser.email} would like to share a Memoease-Set with you and has invited you to the Group ${name}. Click on the link: ${link} and register or log in to access the set.`,
-        };
-        // Send the confirmation email to the member
-        await sendEmail(mailOptions);
-      }
-    }
+      // member validation
+      const validMembers = [];
+      for (const memberId of members) {
+        const member = await getUserById(memberId);
+        if (member) {
+          validMembers.push(memberId);
+        }
+      };
 
-    // Respond with the link
-    res.status(201).json({
-      newGroup,
-      link,
-    });
-  } catch (error) {
-    // Pass the error to the next middleware
-    next(error);
+      if (validMembers.length !== members.length) {
+        return res
+          .status(400)
+          .json({ error: "One or more members are invalid users." });
+      };
+
+      // Respond with the link
+      res.status(201).json({
+        newGroup,
+        link,
+      });
+    } catch (error) {
+      // Pass the error to the next middleware
+      next(error);
+    }
   }
-}
 
 // Function to add the user to the group
 export async function pushUserToGroup(req, res, next) {
-  const { groupId } = req.body;
-  const userId = req.user.id; // Assumption: The user is logged in through authentication
+    const { groupId } = req.body;
+    const userId = req.user.id; // Assumption: The user is logged in through authentication
 
-  try {
-    // Retrieve group information from the database
-    const currentGroup = await GroupModel.getGroupById(groupId);
+    try {
+      // Retrieve group information from the database
+      const currentGroup = await GroupModel.getGroupById(groupId);
 
-    if (!currentGroup) {
-      return res.status(404).json({ error: "Group not found" });
-    }
+      if (!currentGroup) {
+        return res.status(404).json({ error: "Group not found" });
+      }
 
-    // Add the user to the group
-    if (!currentGroup.members.includes(userId)) {
-      currentGroup.members.push(userId);
-    }
+      groupData.members = memberIds;
+    };
 
     // Save the updated group to the database
     const updatedGroup = await GroupModel.updateGroupById(
@@ -117,8 +118,8 @@ export async function pushUserToGroup(req, res, next) {
   } catch (error) {
     // Error handling
     next(error);
-  }
-}
+  };
+};
 
 // Get all User Groups
 export async function getGroupsByUser(req, res, next) {
@@ -129,15 +130,15 @@ export async function getGroupsByUser(req, res, next) {
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
-    }
+    };
 
     const userGroups = await GroupModel.getUserGroups(userId);
 
     res.status(200).json(userGroups);
   } catch (error) {
     next(error);
-  }
-}
+  };
+};
 
 // Update group (admins only)
 export async function updateGroup(req, res, next) {
@@ -150,16 +151,16 @@ export async function updateGroup(req, res, next) {
 
     if (!currentGroup) {
       return res.status(404).json({ error: "Group not found" });
-    }
+    };
 
     if (currentGroup.admin.includes(userId)) {
       // Check if the current user is an admin of the group
       if (updates.name) {
         currentGroup.name = updates.name;
-      }
+      };
       if (updates.members) {
         currentGroup.members = updates.members;
-      }
+      };
 
       const updatedGroup = await GroupModel.updateGroupById(
         groupId,
@@ -169,11 +170,11 @@ export async function updateGroup(req, res, next) {
     } else {
       // If the current user is not an admin, respond with a 403 error
       return res.status(403).json({ error: "Permission denied" });
-    }
+    };
   } catch (error) {
     next(error);
-  }
-}
+  };
+};
 
 // Delete Group (admins only)
 export async function deleteGroup(req, res, next) {
@@ -185,7 +186,7 @@ export async function deleteGroup(req, res, next) {
 
     if (!currentGroup) {
       return res.status(404).json({ error: "Group not found" });
-    }
+    };
 
     if (currentGroup.admin.includes(userId)) {
       // Check if the current user is an admin of the group
@@ -193,14 +194,14 @@ export async function deleteGroup(req, res, next) {
 
       if (!deletedGroup) {
         return res.status(404).json({ error: "Group not found" });
-      }
+      };
 
       res.status(204).send();
     } else {
       // If the current user is not an admin, respond with a 403 error
       return res.status(403).json({ error: "Permission denied" });
-    }
+    };
   } catch (error) {
     next(error);
-  }
-}
+  };
+};

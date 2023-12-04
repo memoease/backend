@@ -30,7 +30,7 @@ export async function createLearnsession(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).end();
-  }
+  };
 };
 
 export async function updateSessionCard(req, res) {
@@ -41,7 +41,7 @@ export async function updateSessionCard(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).end();
-  }
+  };
 };
 
 export async function refreshSession(req, res) {
@@ -58,5 +58,5 @@ export async function refreshSession(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).end();
-  }
+  };
 };
