@@ -27,10 +27,9 @@ export async function sendEmail(options) {
 
 // Create Group (set creator as admin and add members if provided)
 export async function createGroup(req, res, next) {
-  const { name, members } = req.body;
+  const { name, members, flashcardSet } = req.body;
   const userId = req.user.id;
-  const flashcardSetId = req.params.flashcardSetId;
-
+  console.log(flashcardSet);
   try {
     // Check if the current user exists
     const currentUser = await UserModel.getUserById(userId);
@@ -43,14 +42,14 @@ export async function createGroup(req, res, next) {
     const groupData = {
       name,
       admin: userId,
-      flashcardSet: flashcardSetId,
+      flashcardSet: flashcardSet,
     };
 
     // Create the group in the database
     const newGroup = await GroupModel.createGroup(groupData);
 
     // Generate the link
-    const link = `${process.env.HOMEPAGE_URL}/group/${newGroup._id}/set/${flashcardSetId}`;
+    const link = `${process.env.FRONTEND_PORT}/${newGroup._id}/${flashcardSet}`;
 
     // Send emails to members (if provided)
     if (members && Array.isArray(members) && members.length > 0) {

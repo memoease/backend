@@ -157,7 +157,7 @@ export async function loginUser(req, res, next) {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production" ? true : false,
     });
-
+    console.log("ENV", process.env.NODE_ENV);
     // Set a second cookie with user information and HTTP-only set to false
     res.cookie(
       "userInfo",
