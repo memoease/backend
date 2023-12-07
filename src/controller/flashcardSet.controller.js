@@ -18,8 +18,8 @@ export async function postNewCard(req, res, next) {
         res.status(201).send(result);
 
     } catch (error) {
-        console.error(error);
-        next(error);
+        console.error(error.message);
+        next(error.message);
     };
 };
 
