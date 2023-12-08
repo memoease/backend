@@ -84,7 +84,7 @@ export async function pushUserToGroup(req, res, next) {
       return res.status(404).json({ error: "Group not found" });
     }
 
-    groupData.members = memberIds;
+    currentGroup.members.push(userId);
 
     // Save the updated group to the database
     const updatedGroup = await GroupModel.updateGroupById(
