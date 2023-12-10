@@ -1,5 +1,5 @@
 import { createNewCard, deleteCardByCardId, deleteManyCardsById, updateCardInfo } from "../model/flashcard.model.js";
-import { createNewSet, findPublicSets, deleteCardFromSet, getSetBySetId, getSetsByUserId, updateSetBySetId, getSetByCardId, deleteSet } from "../model/flashcardSet.model.js";
+import { createNewSet, findPublicSets, deleteCardFromSet, getSetBySetId, getSetsByUserId, updateSetBySetId, getSetByCardId, deleteSet, findPublicSetsExcludeUser } from "../model/flashcardSet.model.js";
 import { getSessionById } from "../model/learnSession.model.js";
 
 
@@ -143,6 +143,18 @@ export async function updateSetInfo(req, res, next) {
 export async function getRandomPublicSets(req, res, next) {
     try {
         const publicSets = await findPublicSets();
+        res.status(200).send(publicSets);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    };
+};
+
+export async function getRandomPublicSetsExcludeUser(req, res, next) {
+    try {
+        const userId = req.user.id;
+        console.log("userID: ", userId);
+        const publicSets = await findPublicSetsExcludeUser(userId);
         res.status(200).send(publicSets);
     } catch (error) {
         console.error(error);

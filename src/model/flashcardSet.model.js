@@ -1,5 +1,5 @@
 import { Schema, model, ObjectId } from "mongoose";
-
+import { getUserById } from "./user.model.js";
 const flashcardSetSchema = new Schema({
   title: {
     type: String,
@@ -93,7 +93,30 @@ export async function updateSetBySetId(setId, data) {
 
 export async function findPublicSets() {
   const publicSets = await FlashcardSet.aggregate([
-    { $match: { isPublic: true } },
+    {
+      $match: {
+        isPublic: true,
+        $expr: { $gt: [{ $size: "$flashcards" }, 3] }
+      }
+    },
+    { $sample: { size: 6 } },
+  ]);
+  await FlashcardSet.populate(publicSets, { path: "createdBy" });
+  return publicSets;
+};
+
+export async function findPublicSetsExcludeUser(userIdToExclude) {
+  console.log("userIdToexlude:", userIdToExclude);
+
+  const user = getUserById(userIdToExclude);
+  const publicSets = await FlashcardSet.aggregate([
+    {
+      $match: {
+        isPublic: true,
+        $expr: { $gt: [{ $size: "$flashcards" }, 3] },
+        createdBy: { $ne: user._id }
+      }
+    },
     { $sample: { size: 6 } },
   ]);
   await FlashcardSet.populate(publicSets, { path: "createdBy" });

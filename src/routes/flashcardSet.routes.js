@@ -32,5 +32,7 @@ router.put(
 );
 router.get("/public/random", FlashcardSetController.getRandomPublicSets);
 router.get("/public/:setId", FlashcardSetController.getOneSetBySetId);
+router.get("/public/random/nouser", requireAuth, FlashcardSetController.getRandomPublicSetsExcludeUser);
+
 
 export default router;
