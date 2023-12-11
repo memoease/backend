@@ -193,10 +193,14 @@ export async function validateToken(req, res, next) {
 
     // Verify and decode the JWT token
     // The decoded token (decoded) now contains the user data encoded in the payload.
-    jwt.verify(authToken, process.env.JWT_SECRET);
+    const user = jwt.verify(authToken, process.env.JWT_SECRET);
 
     // Send a confirmation response indicating the user is authorized
-    res.status(200).json({ message: "Authorized" });
+    res.status(200).json({
+      message: "Authorized",
+      auth: true,
+      user
+    });
   } catch (error) {
     next(error);
   };
