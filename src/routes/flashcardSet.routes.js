@@ -7,6 +7,7 @@ import * as FlashcardSetController from "../controller/flashcardSet.controller.j
 const router = Router();
 
 router.post("/", requireAuth, FlashcardSetController.postNewSet);
+router.post("/:setId", requireAuth, FlashcardSetController.postNewSetFromPublicSet)
 router.post(
   "/card/:setId",
   requireAuth,
@@ -31,5 +32,7 @@ router.put(
 );
 router.get("/public/random", FlashcardSetController.getRandomPublicSets);
 router.get("/public/:setId", FlashcardSetController.getOneSetBySetId);
+router.get("/public/random/nouser", requireAuth, FlashcardSetController.getRandomPublicSetsExcludeUser);
+
 
 export default router;

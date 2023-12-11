@@ -26,20 +26,20 @@ export function validateId(req, res, next) {
 
   if (!isValid) {
     return res.status(400).json({ error: "Invalid ID!" });
-  }
+  };
 
   next();
-}
+};
 
 export function validateEmail(req, res, next) {
   const isValid = ajv.validate(emailSchema, req.body.email);
 
   if (!isValid) {
     return res.status(400).json({ error: "Invalid email!" });
-  }
+  };
 
   next();
-}
+};
 
 export function validatePassword(req, res, next) {
   const isValid = ajv.validate(passwordSchema, req.body.password);
@@ -48,7 +48,7 @@ export function validatePassword(req, res, next) {
     return res.status(400).json({
       error: "Invalid password! Password must be at least 8 characters long.",
     });
-  }
+  };
 
   next();
-}
+};

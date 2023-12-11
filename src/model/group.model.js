@@ -37,24 +37,24 @@ export default Group;
 export async function createGroup(groupData) {
   const newGroup = new Group(groupData);
   return newGroup.save();
-}
+};
 
 // Create Group with Members
 export async function createGroupWithMemberIds(groupData, memberIds) {
   const newGroup = new Group(groupData);
   newGroup.members = memberIds;
   return newGroup.save();
-}
+};
 
-// Get Groups by Group-OId
+// Get Group by Group-Id
 export async function getGroupById(groupId) {
   return Group.findById(groupId);
-}
+};
 
 // Get All Groups by User
 export async function getUserGroups(userId) {
   return Group.find({ $or: [{ admin: userId }, { members: userId }] });
-}
+};
 
 // Update Group
 export async function updateGroupById(groupId, updatedGroupData) {
@@ -64,9 +64,9 @@ export async function updateGroupById(groupId, updatedGroupData) {
     { new: true }
   );
   return updatedGroup;
-}
+};
 
 // Delete Group
 export async function deleteGroupById(groupId) {
   return Group.findByIdAndDelete(groupId);
-}
+};

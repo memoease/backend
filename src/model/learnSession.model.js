@@ -27,12 +27,12 @@ export async function createSession(data) {
   const newSession = new LearnSession(data);
   const entry = await newSession.save();
   return entry;
-}
+};
 
 export async function getSessionById(sessionId) {
   const session = await LearnSession.findById(sessionId).populate("toLearn");
   return session;
-}
+};
 
 export async function moveCardToLearned(cardId) {
   const session = await LearnSession.findOneAndUpdate(
@@ -43,7 +43,7 @@ export async function moveCardToLearned(cardId) {
   session.isLearned = session.isLearned.concat(cardId);
   const result = await session.save();
   return result;
-}
+};
 
 export async function initalizeSessionCards(sessionId, cards) {
   const updatedSession = await LearnSession.findOneAndUpdate(
@@ -52,9 +52,9 @@ export async function initalizeSessionCards(sessionId, cards) {
     { new: true, populate: { path: "toLearn" } }
   );
   return updatedSession;
-}
+};
 
 export async function deleteSessionsByUserId(userId) {
   const response = await LearnSession.deleteMany({ user: userId });
   return response;
-}
+};

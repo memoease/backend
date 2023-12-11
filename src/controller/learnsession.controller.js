@@ -30,7 +30,7 @@ export async function createLearnsession(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).end();
-  }
+  };
 };
 
 export async function updateSessionCard(req, res) {
@@ -41,13 +41,13 @@ export async function updateSessionCard(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).end();
-  }
+  };
 };
 
 export async function refreshSession(req, res) {
   const { sessionId } = req.params;
+  console.log("session", sessionId);
   try {
-    console.log(sessionId);
     const originalSet = await getSetBySessionId(sessionId);
     console.log(originalSet);
     const updatedSession = await initalizeSessionCards(
@@ -58,5 +58,5 @@ export async function refreshSession(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).end();
-  }
+  };
 };
