@@ -1,5 +1,7 @@
 import { Schema, model, ObjectId } from "mongoose";
 import { getUserById } from "./user.model.js";
+import { getSessionById } from "./learnSession.model.js";
+
 const flashcardSetSchema = new Schema({
   title: {
     type: String,
@@ -67,6 +69,7 @@ export async function getSetByCardId(cardId) {
 
 export async function getSetBySessionId(sessionId) {
   const set = await FlashcardSet.findOne({ session: sessionId });
+  console.log("set:", set);
   return set;
 };
 
@@ -106,9 +109,7 @@ export async function findPublicSets() {
 };
 
 export async function findPublicSetsExcludeUser(userIdToExclude) {
-  console.log("userIdToexlude:", userIdToExclude);
-
-  const user = getUserById(userIdToExclude);
+  const user = await getUserById(userIdToExclude);
   const publicSets = await FlashcardSet.aggregate([
     {
       $match: {

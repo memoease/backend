@@ -46,8 +46,10 @@ export async function updateSessionCard(req, res) {
 
 export async function refreshSession(req, res) {
   const { sessionId } = req.params;
+  console.log("session", sessionId);
   try {
     const originalSet = await getSetBySessionId(sessionId);
+    console.log(originalSet);
     const updatedSession = await initalizeSessionCards(
       sessionId,
       originalSet.flashcards

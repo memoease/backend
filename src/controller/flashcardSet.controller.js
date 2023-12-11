@@ -119,7 +119,6 @@ export async function getOneSetBySetId(req, res, next) {
 
     try {
         const set = await getSetBySetId(setId);
-        console.log(set);
         res.status(200).send(set);
     } catch (error) {
         console.error(error);
@@ -153,7 +152,6 @@ export async function getRandomPublicSets(req, res, next) {
 export async function getRandomPublicSetsExcludeUser(req, res, next) {
     try {
         const userId = req.user.id;
-        console.log("userID: ", userId);
         const publicSets = await findPublicSetsExcludeUser(userId);
         res.status(200).send(publicSets);
     } catch (error) {
