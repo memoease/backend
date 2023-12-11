@@ -166,6 +166,7 @@ export async function loginUser(req, res, next) {
         maxAge: 1000 * 60 * 60 * 3, // 3 hours
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         secure: process.env.NODE_ENV === "production" ? true : false,
+        domain: process.env.FRONTEND_PORT
       }
     );
 
