@@ -210,7 +210,7 @@ export async function validateToken(req, res, next) {
 export async function logoutUser(req, res, next) {
   try {
     // Delete Auth-Token-Cookie
-    res.clearCookie("authToken");
+    res.clearCookie("authToken", { domain: process.env.COOKIE_DOMAIN });
 
     // Delete User-Info-Cookie
     res.clearCookie("userInfo");
