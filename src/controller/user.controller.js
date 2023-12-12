@@ -210,10 +210,10 @@ export async function validateToken(req, res, next) {
 export async function logoutUser(req, res, next) {
   try {
     // Delete Auth-Token-Cookie
-    res.clearCookie("authToken");
+    res.clearCookie("authToken", { domain: provess.env.COOKIE_DOMAIN, path: "/" });
 
     // Delete User-Info-Cookie
-    res.clearCookie("userInfo");
+    res.clearCookie("userInfo", { domain: provess.env.COOKIE_DOMAIN, path: "/" });
 
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
