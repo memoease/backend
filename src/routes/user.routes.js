@@ -31,7 +31,7 @@ userRouter.post(
 userRouter.get("/authenticate", UserController.validateToken);
 
 // Authenticated User Routes
-userRouter.get("/logout", requireAuth, UserController.logoutUser);
+userRouter.post("/logout", requireAuth, UserController.logoutUser);
 userRouter.patch("/:id", validateId, requireAuth, UserController.updateUser);
 userRouter.delete("/:id", validateId, requireAuth, UserController.deleteUser);
 

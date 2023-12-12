@@ -156,6 +156,7 @@ export async function loginUser(req, res, next) {
       maxAge: 1000 * 60 * 60 * 3, // 3 hours
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production" ? true : false,
+      domain: process.env.FRONTEND_PORT
     });
     // Set a second cookie with user information and HTTP-only set to false
     res.cookie(
@@ -210,7 +211,7 @@ export async function validateToken(req, res, next) {
 export async function logoutUser(req, res, next) {
   try {
     // Delete Auth-Token-Cookie
-    res.clearCookie("authToken", { domain: process.env.COOKIE_DOMAIN, path: "/" });
+    res.clearCookie("authToken");
 
     // Delete User-Info-Cookie
     res.clearCookie("userInfo");
