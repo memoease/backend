@@ -111,9 +111,8 @@ export async function confirmEmail(req, res, next) {
     // Set success message and status in the URL
     const successMessage = `Congrats ${user.name}! You are now registered and can continue with the login to start learning.`;
     const status = "success";
-    const redirectUrl = `${
-      process.env.FRONTEND_PORT
-    }/login?status=${status}&message=${encodeURIComponent(successMessage)}`;
+    const redirectUrl = `${process.env.FRONTEND_PORT
+      }/login?status=${status}&message=${encodeURIComponent(successMessage)}`;
 
     // Redirect to login page with success message and status in the URL
     return res.redirect(redirectUrl);
@@ -212,16 +211,10 @@ export async function validateToken(req, res, next) {
 export async function logoutUser(req, res, next) {
   try {
     // Delete Auth-Token-Cookie
-    res.clearCookie("authToken", {
-      domain: provess.env.COOKIE_DOMAIN,
-      path: "/",
-    });
+    res.clearCookie("authToken");
 
     // Delete User-Info-Cookie
-    res.clearCookie("userInfo", {
-      domain: provess.env.COOKIE_DOMAIN,
-      path: "/",
-    });
+    res.clearCookie("userInfo");
 
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
