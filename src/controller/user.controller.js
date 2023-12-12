@@ -31,7 +31,7 @@ async function sendEmail(options) {
 
   // Send email
   await transporter.sendMail(mailOptions);
-};
+}
 
 // Register new User
 export async function registerUser(req, res, next) {
@@ -85,8 +85,8 @@ export async function registerUser(req, res, next) {
   } catch (error) {
     console.error(error);
     next(error);
-  };
-};
+  }
+}
 
 // Email Confirmation
 export async function confirmEmail(req, res, next) {
@@ -111,7 +111,8 @@ export async function confirmEmail(req, res, next) {
     // Set success message and status in the URL
     const successMessage = `Congrats ${user.name}! You are now registered and can continue with the login to start learning.`;
     const status = "success";
-    const redirectUrl = `${process.env.FRONTEND_PORT}/login?status=${status}&message=${encodeURIComponent(successMessage)}`;
+    const redirectUrl = `${process.env.FRONTEND_PORT
+      }/login?status=${status}&message=${encodeURIComponent(successMessage)}`;
 
     // Redirect to login page with success message and status in the URL
     return res.redirect(redirectUrl);
@@ -119,7 +120,7 @@ export async function confirmEmail(req, res, next) {
     console.error(error);
     next(error);
   }
-};
+}
 
 // Login User
 export async function loginUser(req, res, next) {
@@ -131,13 +132,13 @@ export async function loginUser(req, res, next) {
     // User input validation email/password
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Wrong email or password!" });
-    };
+    }
     // email confirmation validation
     if (!user.verify) {
       return res.status(401).json({
         error: `Email not confirmed for ${user.email}. Please confirm your email address.`,
       });
-    };
+    }
 
     const tokenPayload = {
       id: user._id,
@@ -166,7 +167,7 @@ export async function loginUser(req, res, next) {
         maxAge: 1000 * 60 * 60 * 3, // 3 hours
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         secure: process.env.NODE_ENV === "production" ? true : false,
-        // domain: process.env.FRONTEND_PORT
+        //domain: process.env.FRONTEND_PORT,
       }
     );
 
@@ -178,8 +179,8 @@ export async function loginUser(req, res, next) {
     });
   } catch (error) {
     next(error);
-  };
-};
+  }
+}
 
 // Validate Token
 export async function validateToken(req, res, next) {
@@ -189,7 +190,7 @@ export async function validateToken(req, res, next) {
 
     if (!authToken) {
       return res.status(401).json({ error: "Unauthorized" });
-    };
+    }
 
     // Verify and decode the JWT token
     // The decoded token (decoded) now contains the user data encoded in the payload.
@@ -199,27 +200,27 @@ export async function validateToken(req, res, next) {
     res.status(200).json({
       message: "Authorized",
       auth: true,
-      user
+      user,
     });
   } catch (error) {
-    res.end();
-  };
-};
+    next(error);
+  }
+}
 
 // Logout User
 export async function logoutUser(req, res, next) {
   try {
     // Delete Auth-Token-Cookie
-    res.clearCookie("authToken", { domain: provess.env.COOKIE_DOMAIN, path: "/" });
+    res.clearCookie("authToken");
 
     // Delete User-Info-Cookie
-    res.clearCookie("userInfo", { domain: provess.env.COOKIE_DOMAIN, path: "/" });
+    res.clearCookie("userInfo");
 
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     next(error);
-  };
-};
+  }
+}
 
 // Update User
 export async function updateUser(req, res, next) {
@@ -232,7 +233,7 @@ export async function updateUser(req, res, next) {
 
     if (!currentUser) {
       return res.status(404).json({ error: "User not found" });
-    };
+    }
 
     // If updates include a new password, check if the old password is provided
     if (updates.password) {
@@ -240,7 +241,7 @@ export async function updateUser(req, res, next) {
         return res
           .status(400)
           .json({ error: "Old password is required to change the password" });
-      };
+      }
 
       // Check if the old password is correct
       const isOldPasswordValid = await bcrypt.compare(
@@ -250,17 +251,17 @@ export async function updateUser(req, res, next) {
 
       if (!isOldPasswordValid) {
         return res.status(401).json({ error: "Old password is incorrect" });
-      };
+      }
 
       // Hash the new password
       const hashedPassword = await bcrypt.hash(updates.password, 10);
       currentUser.password = hashedPassword;
-    };
+    }
 
     // Update the user's name if provided
     if (updates.name) {
       currentUser.name = updates.name;
-    };
+    }
 
     // Update user information in the database
     const updatedUser = await UserModel.updateUserById(userId, currentUser);
@@ -269,16 +270,16 @@ export async function updateUser(req, res, next) {
     const responseObj = {};
     if (updates.name) {
       responseObj.name = updatedUser.name;
-    };
+    }
     if (updates.password) {
       responseObj.passwordUpdateSuccess = true;
-    };
+    }
 
     res.status(200).json(responseObj); // Respond with the response object
   } catch (error) {
     next(error);
-  };
-};
+  }
+}
 
 // Delete User
 export async function deleteUser(req, res, next) {
@@ -299,7 +300,7 @@ export async function deleteUser(req, res, next) {
 
       // Add the flashcard IDs to the overall cards array
       cardIds.push(...currentCardIds);
-    };
+    }
 
     // Delete the flashcards for all collected card IDs
     await FlashcardModel.deleteManyCardsById(cardIds);
@@ -307,7 +308,7 @@ export async function deleteUser(req, res, next) {
     // Delete all collected sets with their set IDs
     for (const setId of setIds) {
       await FlashcardSetModel.deleteSet(setId);
-    };
+    }
 
     // Delete the learn sessions of the user
     await LearnSessionModel.deleteSessionsByUserId(userId);
@@ -319,5 +320,5 @@ export async function deleteUser(req, res, next) {
   } catch (error) {
     console.error(error);
     next(error);
-  };
-};
+  }
+}

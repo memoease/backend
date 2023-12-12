@@ -71,10 +71,21 @@ export async function postNewSetFromPublicSet(req, res, next) {
 
         const copySet = await getSetBySetId(setId);
 
+        const copiedCards = await Promise.all(copySet.flashcards.map(async flashcard => {
+            const newCard = {
+                question: flashcard.question,
+                answer: flashcard.answer,
+                createdBy: userId
+            };
+
+            return await createNewCard(newCard);
+
+        }));
+
         const newEntry = {
             title: copySet.title,
             description: copySet.description,
-            flashcards: copySet.flashcards,
+            flashcards: copiedCards,
             createdBy: userId,
             isPublic: false
         };
