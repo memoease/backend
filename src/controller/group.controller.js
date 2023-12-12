@@ -29,7 +29,7 @@ export async function sendEmail(options) {
 export async function createGroup(req, res, next) {
   const { name, members, flashcardSet } = req.body;
   const userId = req.user.id;
-  console.log(flashcardSet);
+  //console.log(flashcardSet);
   try {
     // Check if the current user exists
     const currentUser = await UserModel.getUserById(userId);
