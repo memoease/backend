@@ -211,10 +211,18 @@ export async function validateToken(req, res, next) {
 export async function logoutUser(req, res, next) {
   try {
     // Delete Auth-Token-Cookie
-    res.clearCookie("authToken");
+    res.clearCookie("authToken", {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production" ? true : false,
+    });
 
     // Delete User-Info-Cookie
-    res.clearCookie("userInfo");
+    res.clearCookie("userInfo", {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production" ? true : false,
+    });
 
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
